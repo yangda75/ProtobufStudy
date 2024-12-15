@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+message Message_Localization {
+    enum UpdateReason {
+        None = 0;
+        OdoUpdate = 1;
+        LaserCorrec = 2;
+        LaserThenOdo = 3;
+        PGVCORRECT = 4;
+    }
+    double x = 2;
+    double y = 3;
+    double angle = 4;
+    double confidence = 5;
+    repeated double correction_errs = 6;
+    repeated double reliabilities = 7;
+    bool in_forbidden_area = 8;
+    UpdateReason update_reason = 9;
+    enum LocState {
+        Normal = 0;
+        Skidding = 1;
+        LowConfidence = 2;
+    }
+    LocState loc_state = 10;
+    double similarity = 11;
+    enum LocMethod {
+        PF_LASER_2D = 0;
+        SLAM_2D = 1;
+        PGV = 2;
+        REFLECTOR = 3;
+        LASER_3D = 4;
+        BAR_CODE = 5;
+    }
+    LocMethod loc_method = 12;
+}

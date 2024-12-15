@@ -1,0 +1,9 @@
+build
+.vs
+.vscode
+out
+CMakeUserPresets.json
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
