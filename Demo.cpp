@@ -1,4 +1,4 @@
-#include "proto/Person.pb.h"
+#include <Person.pb.h>
 #include <iostream>
 
 

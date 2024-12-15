@@ -7,3 +7,4 @@ CMakeUserPresets.json
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+install
