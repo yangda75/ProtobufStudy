@@ -13,25 +13,23 @@ set(MY_PROTO_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/proto)
 add_library(proto SHARED)
 target_sources(proto PRIVATE proto/Person.proto proto/Localization.proto)
 set(PROTO_FILES proto/Person.proto proto/Localization.proto)
-protobuf_generate(LANGUAGE cpp PROTO_SRCS PROTO_HDRS TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR})
 if(MSVC)
-    protobuf_generate(LANGUAGE cpp PROTO_SRCS PROTO_HDRS TARGET proto EXPORT_MACRO NAIVE_API)
+	protobuf_generate(LANGUAGE cpp TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR} EXPORT_MACRO NAIVE_API)
+else()
+	protobuf_generate(LANGUAGE cpp TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR})
 endif()
-# target_sources(proto PRIVATE ${PROTO_SRCS})
-# target_sources(proto PUBLIC FILE_SET HEADERS FILES ${PROTO_HDRS})
 
 target_include_directories(proto INTERFACE ${MY_PROTO_HEADER_DIR})
 target_link_libraries(proto PUBLIC protobuf::libprotobuf Threads::Threads)
 
 if(MSVC)
-    target_compile_definitions(proto PRIVATE NAIVE_API="__declspec (dllexport)")
+    target_compile_definitions(proto PRIVATE NAIVE_API=__declspec\(dllexport\))
 endif()
 add_executable(Demo Demo.cpp)
 target_link_libraries(Demo PRIVATE proto)
 
 if(MSVC)
-    target_include_directories(Demo PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-    target_compile_definitions(Demo PRIVATE NAIVE_API="__declspec (dllimport)")
+    target_compile_definitions(Demo PRIVATE NAIVE_API=__declspec\(dllimport\))
 endif()
 
 
@@ -42,10 +40,17 @@ cmake_print_properties(
 )
 
 # install
+if(MSVC)
+	install(TARGETS Demo proto RUNTIME_DEPENDENCIES 
+	PRE_EXCLUDE_REGEXES [[api-ms-win-.*]] [[ext-ms-.*]] [[kernel32\.dll]]
+	POST_EXCLUDE_REGEXES [[.*(\\|/)system32(\\|/).*\.dll]])
+else()
+
 include(GNUInstallDirs)
 file(RELATIVE_PATH relDir 
     ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR} 
     ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(Demo PROPERTIES INSTALL_RPATH "$ORIGIN/${relDir}")
-install(TARGETS Demo proto RUNTIME_DEPENDENCIES)
+install(TARGETS Demo proto RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]])
+endif()
