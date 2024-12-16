@@ -14,9 +14,9 @@ add_library(proto SHARED)
 target_sources(proto PRIVATE proto/Person.proto proto/Localization.proto)
 set(PROTO_FILES proto/Person.proto proto/Localization.proto)
 if(MSVC)
-	protobuf_generate(LANGUAGE cpp TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR} EXPORT_MACRO NAIVE_API)
+    protobuf_generate(LANGUAGE cpp TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR} EXPORT_MACRO NAIVE_API)
 else()
-	protobuf_generate(LANGUAGE cpp TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR})
+    protobuf_generate(LANGUAGE cpp TARGET proto APPEND_PATH PROTOC_OUT_DIR ${MY_PROTO_HEADER_DIR})
 endif()
 
 target_include_directories(proto INTERFACE ${MY_PROTO_HEADER_DIR})
@@ -41,16 +41,24 @@ cmake_print_properties(
 
 # install
 if(MSVC)
-	install(TARGETS Demo proto RUNTIME_DEPENDENCIES 
-	PRE_EXCLUDE_REGEXES [[api-ms-win-.*]] [[ext-ms-.*]] [[kernel32\.dll]]
-	POST_EXCLUDE_REGEXES [[.*(\\|/)system32(\\|/).*\.dll]])
+    install(
+        TARGETS Demo proto 
+        RUNTIME_DEPENDENCIES 
+            PRE_EXCLUDE_REGEXES [[api-ms-win-.*]] [[ext-ms-.*]] [[kernel32\.dll]]
+            POST_EXCLUDE_REGEXES [[.*(\\|/)system32(\\|/).*\.dll]]
+    )
 else()
 
-include(GNUInstallDirs)
-file(RELATIVE_PATH relDir 
-    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR} 
-    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+    include(GNUInstallDirs)
+    file(RELATIVE_PATH relDir 
+        ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR} 
+        ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
+    )
 
-set_target_properties(Demo PROPERTIES INSTALL_RPATH "$ORIGIN/${relDir}")
-install(TARGETS Demo proto RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]])
+    set_target_properties(Demo PROPERTIES INSTALL_RPATH "$ORIGIN/${relDir}")
+    install(
+        TARGETS Demo proto 
+        RUNTIME_DEPENDENCIES 
+            PRE_EXCLUDE_REGEXES [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
+    )
 endif()
